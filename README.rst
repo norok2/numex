@@ -1,17 +1,7 @@
 NumEx: a quick-and-easy explorer for numerical data
 ===================================================
 
-This Python library implements intend to implement automatic generation of
-User-Interfaces from function/class signatures.
-
-The pseudo-widget semantic follows HTML5 conventions.
-
-There are plans to includes support for:
-
-- Graphical User-Interfaces (through Tk)
-- Command-Line Interfaces (with coloring support via ``blessings``/``blessed``)
-- Text User-Interfaces (through ``asciimatics``)
-- Web Forms (with Flask)
+This Python software implements a quick and easy explore for numerical data.
 
 
 Installation
