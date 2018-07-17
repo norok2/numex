@@ -106,6 +106,9 @@ doc/*.pdf
 # PyBuilder
 target/
 
-
-
-
+# Preparation
+*.png
+*.gif
+*.xbm
+*.npy
+*.npy.gz

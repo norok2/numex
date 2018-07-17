@@ -23,6 +23,10 @@ from setuptools import setup
 from setuptools import find_packages
 
 # ======================================================================
+# :: Additional imports
+from numex import DIRS
+
+# ======================================================================
 # project specific variables
 NAME = 'numex'
 VERSION_FILEPATH = os.path.join(NAME.lower(), '_version.py')
@@ -134,8 +138,38 @@ setup(
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
+    install_requires=[
+        'numpy',
+        'matplotlib',
+        'appdirs',
+        'pytk',
+    ],
+
     setup_requires=[
         'setuptools',
-        'setuptools_scm'
+        'setuptools_scm',
+        'appdirs',
     ],
+
+    extras_require={
+        'blessed': 'blessed',
+        'nibabel': 'nibabel',
+    },
+
+    # package_data={
+    #     'numex': ['artwork/icon.png', ],
+    # },
+    # include_package_data=True,
+
+    data_files=[(DIRS['data'], ['artwork/icon.png'])],
+
+    entry_points={
+        # 'console_scripts': [
+        # ],
+
+        'gui_scripts': [
+            'numex=numex.gui_tk_mpl:main',
+        ],
+    },
+
 )

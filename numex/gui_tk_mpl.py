@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 NumEx: Tk/Matplotlib Graphical User Interface (GUI).
+
+This software is intended for exploring data within NumPy's ndarray objects.
+It can be used both as a library or as a stand-alone application.
+A number of I/O plugins are implemented, and it is (very) easy to create new.
+Rudimentary support for metadata is also available.
 """
 
 # ======================================================================
@@ -20,21 +25,20 @@ import textwrap  # Text wrapping and filling
 
 # :: External Imports
 import numpy as np  # NumPy (multidimensional numerical arrays library)
-import scipy as sp  # SciPy (signal and image processing library)
 import matplotlib.cm, matplotlib.lines, matplotlib.markers, matplotlib.colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 # :: Local Imports
 import numex as nme
 import numex.interactive_tk_mpl
-import numex.plugins.synthetic
+from numex.plugins import EXT, synthetic, io_numpy, io_nibabel
 
 from numex import INFO, DIRS
 from numex import VERB_LVL, D_VERB_LVL
 from numex import msg, dbg
 from numex import elapsed, report
 
-TITLE = __doc__.strip().split('\n')[0][:-1]
+TITLE = nme.__doc__.strip().split('\n')[0][:-1]
 
 COLORMAPS = sorted(str(v) for v in matplotlib.cm.datad)
 COLORS = sorted(str(k) for k, v in matplotlib.colors.cnames.items())
@@ -51,15 +55,135 @@ INTERACTIVE_BASE = collections.OrderedDict([
         label='Complex Display Mode', default='auto',
         values=('auto', 'horizontal', 'vertical'))),
 ])
+MODES = {
+    '1d': '1D',
+    '2d_plot_xy': '2D Plot(x,y)',
+    '2d_map': '2D Map',
+    # '2d_map_profile': '2D Map with Profile',
+}
 
 
 # ======================================================================
-def selector(arr, mode=None):
-    modes = {
-        '1d': '1D',
-        '2d_plot_xy': '2D Plot(x,y)',
-        '2d_map': '2D Map',
-        '2d_map_profile': '2D Map with Profile'}
+def add_extsep(ext):
+    """
+    Add a extsep char to a filename extension, if it does not have one.
+
+    Args:
+        ext (str): Filename extension to which the dot has to be added.
+
+    Returns:
+        ext (str): Filename extension with a prepending dot.
+
+    Examples:
+        >>> add_extsep('txt')
+        '.txt'
+        >>> add_extsep('.txt')
+        '.txt'
+        >>> add_extsep('')
+        '.'
+    """
+    if not ext:
+        ext = ''
+    ext = ('' if ext.startswith(os.path.extsep) else os.path.extsep) + ext
+    return ext
+
+
+# ======================================================================
+def split_ext(
+        filepath,
+        ext=None,
+        case_sensitive=False,
+        auto_multi_ext=True):
+    """
+    Split the filepath into a pair (root, ext), so that: root + ext == path.
+    root is everything that precedes the first extension separator.
+    ext is the extension (including the separator).
+
+    It can automatically detect multiple extensions.
+    Since `os.path.extsep` is often '.', a `os.path.extsep` between digits is
+    not considered to be generating and extension.
+
+    Args:
+        filepath (str): The input filepath.
+        ext (str|None): The expected extension (with or without the dot).
+            If None, it will be obtained automatically.
+            If empty, no split is performed.
+        case_sensitive (bool): Case-sensitive match of old extension.
+            If `ext` is None or empty, it has no effect.
+        auto_multi_ext (bool): Automatically detect multiple extensions.
+            If True, include multiple extensions.
+            If False, only the last extension is detected.
+            If `ext` is not None or empty, it has no effect.
+
+    Returns:
+        result (tuple): The tuple
+            contains:
+             - root (str): The filepath without the extension.
+             - ext (str): The extension including the separator.
+
+    Examples:
+        >>> split_ext('test.txt', '.txt')
+        ('test', '.txt')
+        >>> split_ext('test.txt')
+        ('test', '.txt')
+        >>> split_ext('test.txt.gz')
+        ('test', '.txt.gz')
+        >>> split_ext('test_1.0.txt')
+        ('test_1.0', '.txt')
+        >>> split_ext('test.0.txt')
+        ('test', '.0.txt')
+        >>> split_ext('test.txt', '')
+        ('test.txt', '')
+    """
+    root = filepath
+    if ext is not None:
+        ext = add_extsep(ext)
+        has_ext = filepath.lower().endswith(ext.lower()) \
+            if not case_sensitive else filepath.endswith(ext)
+        if has_ext:
+            root = filepath[:-len(ext)]
+        else:
+            ext = ''
+    else:
+        if auto_multi_ext:
+            ext = ''
+            is_valid = True
+            while is_valid:
+                tmp_filepath_noext, tmp_ext = os.path.splitext(root)
+                if tmp_filepath_noext and tmp_ext:
+                    is_valid = not (tmp_ext[1].isdigit() and
+                                    tmp_filepath_noext[-1].isdigit())
+                    if is_valid:
+                        root = tmp_filepath_noext
+                        ext = tmp_ext + ext
+                else:
+                    is_valid = False
+        else:
+            root, ext = os.path.splitext(filepath)
+    return root, ext
+
+
+# ======================================================================
+def io_selector(filepath, mode=None):
+    root, ext = split_ext(filepath)
+    if mode is None:
+        if ext[1:] in EXT:
+            loader = EXT[ext[1:]]
+        else:
+            text = 'Could not load data from `{filepath}`.'.format(**locals())
+            raise ValueError(text)
+    else:
+        try:
+            loader = EXT[mode]
+        except KeyError:
+            loader = io_selector(filepath, None)
+    return loader
+
+
+# ======================================================================
+def plot_selector(
+        arr,
+        mode=None):
     if mode is None:
         if len(arr.shape) == 1:
             mode = '1d'
@@ -67,13 +191,13 @@ def selector(arr, mode=None):
             mode = '2d_plot_xy'
         else:
             mode = '2d_map'
-    if mode in modes:
+    if mode in MODES:
         interactives = INTERACTIVE_BASE
         plotting_func = eval('plot_ndarray_' + mode)
         interactives.update(eval('gen_interactives_' + mode + '(arr)'))
-        title = modes[mode]
+        title = MODES[mode]
     else:
-        plotting_func, interactives, title = selector(arr, None)
+        plotting_func, interactives, title = plot_selector(arr, None)
     return plotting_func, interactives, title
 
 
@@ -143,7 +267,7 @@ def gen_interactives_2d_map(arr):
         +
         [('index-{}'.format(i), dict(
             label='Index[{:0{n_digits}d}]'.format(i, n_digits=n_digits),
-            default=0, start=0, stop=d - 1, step=1))
+            default=d // 2, start=0, stop=d - 1, step=1))
          for i, d in enumerate(arr.shape)]
         +
         [('cmap-{}'.format(i), dict(
@@ -161,7 +285,6 @@ def plot_ndarray_1d(
         params=None,
         plt_title='',
         plt_interactives=None):
-
     try:
         mask = [v for k, v in params.items() if k.startswith('index-')]
         mask[params['axis']] = slice(None)
@@ -279,7 +402,8 @@ def plot_ndarray_2d_plot_xy(
                 ax.plot(
                     x_arr_, y_arr_,
                     color=params['line-color'], linewidth=params['line-width'],
-                    linestyle=params['line-style'], marker=params['line-marker'],
+                    linestyle=params['line-style'],
+                    marker=params['line-marker'],
                     markersize=params['marker-size'])
                 ax.set_xlabel('Values @ {} / arb.units'.format(
                     [x if isinstance(x, int) else np.nan for x in x_mask]))
@@ -325,8 +449,12 @@ def plot_ndarray_2d_map(
             img = img.T
 
         if not np.iscomplexobj(img):
+            img = img.astype(float)
+            data_lim = (np.min(arr), np.max(arr))
             ax = fig.gca()
-            pax = ax.imshow(img, cmap=params['cmap-0'], origin='bottom')
+            pax = ax.imshow(
+                img, vmin=data_lim[0], vmax=data_lim[1],
+                cmap=params['cmap-0'], origin='bottom')
             divider = make_axes_locatable(ax)
             cax = divider.append_axes('right', size='5%', pad=0.05)
             cbar = ax.figure.colorbar(pax, cax=cax)
@@ -346,12 +474,13 @@ def plot_ndarray_2d_map(
             imgs = (img.real, img.imag)
             titles = ('Real Part', 'Imaginary Part')
             data_lim = (
-                min([np.min(x) for x in imgs]), max([np.max(x) for x in imgs]))
+                min(np.min(arr.real), np.min(arr.imag)),
+                max(np.max(arr.real), np.max(arr.imag)))
             data_lims = (data_lim, data_lim)
             if params['cx_mode'] == 'mag-phase':
                 imgs = (np.abs(img), np.arctan2(img.real, img.imag))
                 titles = ('Magnitude', 'Phase')
-                data_lims = ((0, np.max(imgs[0])), (-np.pi, np.pi))
+                data_lims = ((0, np.max(np.abs(arr))), (-np.pi, np.pi))
 
             for i, infos in enumerate(zip(axs, imgs, titles, data_lims)):
                 ax, img_, title, data_lim = infos
@@ -383,8 +512,10 @@ def plot_ndarray_2d_map(
 
 
 # ======================================================================
-def explore(arr, mode=None):
-    plotting_func, interactives, title = selector(arr, mode)
+def explore(
+        arr,
+        mode='auto'):
+    plotting_func, interactives, title = plot_selector(arr, mode)
     nme.interactive_tk_mpl.plotting(
         plotting_func, interactives=interactives,
         title=TITLE, about=__doc__, arr=arr,
@@ -420,8 +551,14 @@ def handle_arg():
         help='override verbosity settings to suppress output [%(default)s]')
     # :: Add additional arguments
     arg_parser.add_argument(
-        '-i', '--in_filepath', metavar='FILEPATH',
-        help='Input filepath [%(default)s]')
+        'in_filepath', metavar='FILEPATH',
+        help='The input file path [%(default)s]')
+    arg_parser.add_argument(
+        '-t', '--file_type', metavar='TYPE', default=None,
+        help='File type of input [%(default)s]')
+    arg_parser.add_argument(
+        '-m', '--mode', metavar='MODE', default=None,
+        help='Visualization of data mode [%(default)s]')
     return arg_parser
 
 
@@ -438,8 +575,9 @@ def main():
         arg_parser.print_help()
         msg('\nARGS: ' + str(vars(args)), args.verbose, VERB_LVL['debug'])
 
-    arr = nme.plugins.synthetic.gen_random((128, 128, 64, 32), dtype=complex)
-    explore(arr, '2d_plot_xy')
+    loader = io_selector(args.in_filepath, args.file_type)
+    arr = loader(args.in_filepath)
+    explore(arr, args.mode)
 
     elapsed(__file__[len(DIRS['base']) + 1:])
     msg(report())

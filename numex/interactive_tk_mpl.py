@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-NumEx: Numpy-ndarray Explorer.
+NumEx: Interactive GUI generator using Tk/Matplotlib.
 
 Generate interactive plots from a minimal set of specification.
 Uses Tk (Python's default) and MatPlotLib.
@@ -164,7 +164,7 @@ class PytkMain(pytk.widgets.Frame):
         self.fig = mpl.figure.Figure(figsize=(0.1, 0.1))
         self.canvas = tkagg.FigureCanvasTkAgg(
             self.fig, self.frmLeft)
-        self.nav_toolbar = tkagg.NavigationToolbar2TkAgg(
+        self.nav_toolbar = tkagg.NavigationToolbar2Tk(
             self.canvas, self.frmLeft)
         self.canvas.get_tk_widget().pack(fill='both', expand=True)
 

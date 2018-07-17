@@ -20,7 +20,7 @@ import appdirs  # Determine appropriate platform-specific dirs
 
 # ======================================================================
 # :: Version
-__version__ = '0.1.dev154+n79cee1b'
+from ._version import __version__
 
 # ======================================================================
 # :: Project Details
