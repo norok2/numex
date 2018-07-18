@@ -25,7 +25,7 @@ import textwrap  # Text wrapping and filling
 
 # :: External Imports
 import numpy as np  # NumPy (multidimensional numerical arrays library)
-import matplotlib.cm, matplotlib.lines, matplotlib.markers, matplotlib.colors
+import matplotlib.cm, matplotlib.lines, matplotlib.colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 # :: Local Imports

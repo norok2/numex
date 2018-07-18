@@ -161,7 +161,7 @@ setup(
     # },
     # include_package_data=True,
 
-    data_files=[(DIRS['data'], ['artwork/icon.png'])],
+    data_files=[('share/icons', ['artwork/icon.png'])],
 
     entry_points={
         # 'console_scripts': [
