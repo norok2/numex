@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-inkscape -d 300 numex_logo.svgz  --export-png=numex_logo.png
-cp numex_logo.png icon.png
+PACKAGE="numex"
+
+cd artwork
+inkscape -d 300 ${PACKAGE}_logo.svgz  --export-png=${PACKAGE}_logo.png
+cp ${PACKAGE}_logo.png icon.png
 convert icon.png icon.xbm
 convert icon.png icon.gif
+
+mkdir -p ../${PACKAGE}/re
+mv icon.* ../${PACKAGE}/resources/
