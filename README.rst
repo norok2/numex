@@ -7,20 +7,20 @@ This Python software implements a quick and easy explore for numerical data.
 Installation
 ------------
 The recommended way of installing the software is through
-`PyPI <https://pypi.python.org/pypi/autoui>`_:
+`PyPI <https://pypi.python.org/pypi/numex>`_:
 
 .. code:: shell
 
-    $ pip install autoui
+    $ pip install numex
 
 Alternatively, you can clone the source repository from
-`Bitbucket <https://bitbucket.org/norok2/autoui>`_:
+`Bitbucket <https://bitbucket.org/norok2/numex>`_:
 
 .. code:: shell
 
-    $ mkdir autoui
-    $ cd autoui
-    $ git clone git@bitbucket.org:norok2/autoui.git
+    $ mkdir numex
+    $ cd numex
+    $ git clone git@bitbucket.org:norok2/numex.git
     $ python setup.py install
 
 (some steps may require additional permissions depending on your configuration)
@@ -28,5 +28,5 @@ Alternatively, you can clone the source repository from
 The software does not have additional dependencies beyond Python and its
 standard library.
 
-It was tested with Python 2.7 and 3.5.
+It was tested with Python 2.7 and 3.6.
 Other version were not tested.

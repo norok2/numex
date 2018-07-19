@@ -108,7 +108,7 @@ setup(
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 4 - Beta',
 
         'Intended Audience :: Developers',
         'Intended Audience :: End Users/Desktop',
@@ -127,7 +127,6 @@ setup(
         ' (GPLv3+)',
 
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
     ],
 
@@ -162,7 +161,7 @@ setup(
     },
     include_package_data=True,
 
-    # data_files=[('share/icons', ['artwork/icon.png'])],
+    data_files=[('share/icons', ['artwork/numex_logo.svgz'])],
 
     entry_points={
         # 'console_scripts': [
