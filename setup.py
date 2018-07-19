@@ -143,6 +143,7 @@ setup(
         'matplotlib',
         'appdirs',
         'pytk',
+        'setuptools',
     ],
 
     setup_requires=[
@@ -156,12 +157,12 @@ setup(
         'nibabel': 'nibabel',
     },
 
-    # package_data={
-    #     'numex': ['artwork/icon.png', ],
-    # },
-    # include_package_data=True,
+    package_data={
+        'numex': ['resources/icon.*', ],
+    },
+    include_package_data=True,
 
-    data_files=[('share/icons', ['artwork/icon.png'])],
+    # data_files=[('share/icons', ['artwork/icon.png'])],
 
     entry_points={
         # 'console_scripts': [

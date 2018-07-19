@@ -292,11 +292,14 @@ def plotting(
         func,
         interactives,
         gui_main=PytkMain,
+        resources_path=None,
         *args,
         **kwargs):
     root = pytk.tk.Tk()
     app = gui_main(root, func, interactives, *args, **kwargs)
-    pytk.utils.set_icon(root, 'icon', DIRS['data'])
+    if resources_path is None:
+        resources_path = DIRS['resources']
+    pytk.utils.set_icon(root, 'icon', resources_path)
     root.mainloop()
     return root
 
