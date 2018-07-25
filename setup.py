@@ -24,7 +24,7 @@ from setuptools import find_packages
 
 # ======================================================================
 # :: Additional imports
-from numex import DIRS
+from numex import PATH
 
 # ======================================================================
 # project specific variables
@@ -143,6 +143,7 @@ setup(
         'appdirs',
         'pytk',
         'setuptools',
+        'flyingcircus',
     ],
 
     setup_requires=[

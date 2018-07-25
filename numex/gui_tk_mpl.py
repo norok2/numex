@@ -33,7 +33,7 @@ import numex as nme
 import numex.interactive_tk_mpl
 from numex.plugins import EXT, synthetic, io_numpy, io_nibabel
 
-from numex import INFO, DIRS
+from numex import INFO, PATH
 from numex import VERB_LVL, D_VERB_LVL
 from numex import msg, dbg
 from numex import elapsed, report
@@ -579,7 +579,7 @@ def main():
     arr = loader(args.in_filepath)
     explore(arr, args.mode)
 
-    elapsed(__file__[len(DIRS['base']) + 1:])
+    elapsed(__file__[len(PATH['base']) + 1:])
     msg(report())
 
 

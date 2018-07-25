@@ -69,7 +69,7 @@ import matplotlib.backends.backend_tkagg as tkagg
 # :: Local Imports
 import numex as nme
 
-from numex import INFO, DIRS, MY_GREETINGS
+from numex import INFO, PATH, MY_GREETINGS
 # from numex import VERB_LVL, D_VERB_LVL, VERB_LVL_NAMES
 from numex import elapsed, report
 from numex import msg, dbg
@@ -298,14 +298,14 @@ def plotting(
     root = pytk.tk.Tk()
     app = gui_main(root, func, interactives, *args, **kwargs)
     if resources_path is None:
-        resources_path = DIRS['resources']
+        resources_path = PATH['resources']
     pytk.utils.set_icon(root, 'icon', resources_path)
     root.mainloop()
     return root
 
 
 # ======================================================================
-elapsed(__file__[len(DIRS['base']) + 1:])
+elapsed(__file__[len(PATH['base']) + 1:])
 
 # ======================================================================
 if __name__ == '__main__':
