@@ -288,7 +288,7 @@ def plot_ndarray_1d(
     try:
         mask = [v for k, v in params.items() if k.startswith('index-')]
         mask[params['axis']] = slice(None)
-        y_arr = arr[mask]
+        y_arr = arr[tuple(mask)]
         x_arr = np.arange(len(y_arr))
         if not np.iscomplexobj(y_arr):
             ax = fig.gca()
@@ -360,8 +360,8 @@ def plot_ndarray_2d_plot_xy(
         x_mask[params['axis']] = slice(None)
         y_mask = [v for k, v in params.items() if k.startswith('y-index-')]
         y_mask[params['axis']] = slice(None)
-        y_arr = arr[x_mask]
-        x_arr = arr[y_mask]
+        y_arr = arr[tuple(x_mask)]
+        x_arr = arr[tuple(y_mask)]
         if not np.iscomplexobj(x_arr) and not np.iscomplexobj(y_arr):
             ax = fig.gca()
             ax.plot(
@@ -444,7 +444,7 @@ def plot_ndarray_2d_map(
                 plt_interactives['axis-0']['label'],
                 plt_interactives['axis-1']['label'])
             raise ValueError(text)
-        img = arr[mask]
+        img = arr[tuple(mask)]
         if params['axis-1'] > params['axis-0']:
             img = img.T
 
