@@ -63,7 +63,7 @@ MY_GREETINGS = r"""
 print(MY_GREETINGS)
 
 # ======================================================================
-PATH = pkg_paths()
+PATH = pkg_paths(__file__, INFO['name'], INFO['author'], INFO['version'])
 
 # ======================================================================
 elapsed()
