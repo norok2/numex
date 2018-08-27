@@ -19,12 +19,15 @@ from __future__ import (
 import os  # Miscellaneous operating system interfaces
 import argparse  # Argument Parsing
 import collections  # Container datatypes
-import datetime  # Basic date and time types
+# import datetime  # Basic date and time types
 import traceback  # Print or retrieve a stack traceback
 import textwrap  # Text wrapping and filling
+import multiprocessing  # Process-based parallelism
 
 # :: External Imports
 import numpy as np  # NumPy (multidimensional numerical arrays library)
+import flyingcircus as fc
+import flyingcircus.util
 import matplotlib.cm, matplotlib.lines, matplotlib.colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -51,8 +54,8 @@ INTERACTIVE_BASE = collections.OrderedDict([
     ('cx_mode', dict(
         label='Complex Mode', default='real-imag',
         values=('real-imag', 'mag-phase'))),
-    ('cx_display_mode', dict(
-        label='Complex Display Mode', default='auto',
+    ('display_orientation', dict(
+        label='Display Orientation', default='auto',
         values=('auto', 'horizontal', 'vertical'))),
 ])
 MODES = {
@@ -64,108 +67,8 @@ MODES = {
 
 
 # ======================================================================
-def add_extsep(ext):
-    """
-    Add a extsep char to a filename extension, if it does not have one.
-
-    Args:
-        ext (str): Filename extension to which the dot has to be added.
-
-    Returns:
-        ext (str): Filename extension with a prepending dot.
-
-    Examples:
-        >>> add_extsep('txt')
-        '.txt'
-        >>> add_extsep('.txt')
-        '.txt'
-        >>> add_extsep('')
-        '.'
-    """
-    if not ext:
-        ext = ''
-    ext = ('' if ext.startswith(os.path.extsep) else os.path.extsep) + ext
-    return ext
-
-
-# ======================================================================
-def split_ext(
-        filepath,
-        ext=None,
-        case_sensitive=False,
-        auto_multi_ext=True):
-    """
-    Split the filepath into a pair (root, ext), so that: root + ext == path.
-    root is everything that precedes the first extension separator.
-    ext is the extension (including the separator).
-
-    It can automatically detect multiple extensions.
-    Since `os.path.extsep` is often '.', a `os.path.extsep` between digits is
-    not considered to be generating and extension.
-
-    Args:
-        filepath (str): The input filepath.
-        ext (str|None): The expected extension (with or without the dot).
-            If None, it will be obtained automatically.
-            If empty, no split is performed.
-        case_sensitive (bool): Case-sensitive match of old extension.
-            If `ext` is None or empty, it has no effect.
-        auto_multi_ext (bool): Automatically detect multiple extensions.
-            If True, include multiple extensions.
-            If False, only the last extension is detected.
-            If `ext` is not None or empty, it has no effect.
-
-    Returns:
-        result (tuple): The tuple
-            contains:
-             - root (str): The filepath without the extension.
-             - ext (str): The extension including the separator.
-
-    Examples:
-        >>> split_ext('test.txt', '.txt')
-        ('test', '.txt')
-        >>> split_ext('test.txt')
-        ('test', '.txt')
-        >>> split_ext('test.txt.gz')
-        ('test', '.txt.gz')
-        >>> split_ext('test_1.0.txt')
-        ('test_1.0', '.txt')
-        >>> split_ext('test.0.txt')
-        ('test', '.0.txt')
-        >>> split_ext('test.txt', '')
-        ('test.txt', '')
-    """
-    root = filepath
-    if ext is not None:
-        ext = add_extsep(ext)
-        has_ext = filepath.lower().endswith(ext.lower()) \
-            if not case_sensitive else filepath.endswith(ext)
-        if has_ext:
-            root = filepath[:-len(ext)]
-        else:
-            ext = ''
-    else:
-        if auto_multi_ext:
-            ext = ''
-            is_valid = True
-            while is_valid:
-                tmp_filepath_noext, tmp_ext = os.path.splitext(root)
-                if tmp_filepath_noext and tmp_ext:
-                    is_valid = not (tmp_ext[1].isdigit() and
-                                    tmp_filepath_noext[-1].isdigit())
-                    if is_valid:
-                        root = tmp_filepath_noext
-                        ext = tmp_ext + ext
-                else:
-                    is_valid = False
-        else:
-            root, ext = os.path.splitext(filepath)
-    return root, ext
-
-
-# ======================================================================
 def io_selector(filepath, mode=None):
-    root, ext = split_ext(filepath)
+    root, ext = fc.util.split_ext(filepath)
     if mode is None:
         if ext[1:] in EXT:
             loader = EXT[ext[1:]]
@@ -300,9 +203,9 @@ def plot_ndarray_1d(
             ax.set_xlabel('Index of Axis {}'.format(params['axis']))
             ax.set_ylabel('Values / arb.units')
         else:
-            if params['cx_display_mode'] == 'horizontal':
+            if params['display_orientation'] == 'horizontal':
                 rows_cols = (1, 2)
-            else:  # if params['cx_display_mode'] in ('vertical', 'auto'):
+            else:  # if params['display_orientation'] in ('vertical', 'auto'):
                 rows_cols = (2, 1)
             y_arrs = (y_arr.real, y_arr.imag)
             titles = ('Real Part', 'Imaginary Part')
@@ -374,9 +277,9 @@ def plot_ndarray_2d_plot_xy(
             ax.set_ylabel('Values @ {} / arb.units'.format(
                 [x if isinstance(x, int) else np.nan for x in y_mask]))
         else:
-            if params['cx_display_mode'] == 'horizontal':
+            if params['display_orientation'] == 'horizontal':
                 rows_cols = (1, 2)
-            else:  # if params['cx_display_mode'] in ('vertical', 'auto'):
+            else:  # if params['display_orientation'] in ('vertical', 'auto'):
                 rows_cols = (2, 1)
             xy_arrs = ((x_arr.real, y_arr.real), (x_arr.imag, y_arr.imag))
             titles = ('Real Part', 'Imaginary Part')
@@ -464,11 +367,11 @@ def plot_ndarray_2d_map(
             ax.set_ylabel('Index of Axis {}'.format(params['axis-1']))
             # ax.set_title()
         else:
-            if params['cx_display_mode'] == 'horizontal':
+            if params['display_orientation'] == 'horizontal':
                 rows_cols = (1, 2)
-            elif params['cx_display_mode'] == 'vertical':
+            elif params['display_orientation'] == 'vertical':
                 rows_cols = (2, 1)
-            else:  # if params['cx_display_mode'] == 'auto':
+            else:  # if params['display_orientation'] == 'auto':
                 rows_cols = (2, 1) if img.shape[0] < img.shape[1] else (1, 2)
             axs = fig.subplots(nrows=rows_cols[0], ncols=rows_cols[1])
             imgs = (img.real, img.imag)
@@ -514,12 +417,37 @@ def plot_ndarray_2d_map(
 # ======================================================================
 def explore(
         arr,
-        mode='auto'):
+        mode='auto',
+        spawn=True):
+    """
+    Explore a NumPy array.
+
+    Args:
+        arr (np.ndarray): The input array.
+        mode (str): The visualization mode.
+            This is computed using `numex.gui_tk_mpl.plot_selector()`.
+            See that for more info.
+        spawn (bool): Spawn a non-blocking process.
+            If True, delegate the data exploration to a separate process,
+            and continue execution of the script's code.
+            This is useful for interactive sessions.
+            If False, the execution of the script is blocked until the data
+            is being explored.
+
+    Returns:
+        None.
+    """
     plotting_func, interactives, title = plot_selector(arr, mode)
-    nme.interactive_tk_mpl.plotting(
-        plotting_func, interactives=interactives,
-        title=TITLE, about=__doc__, arr=arr,
+    plotting_kws = dict(
+        interactives=interactives, title=TITLE, about=__doc__, arr=arr,
         plt_title=title, plt_interactives=interactives)
+    if spawn:
+        proc = multiprocessing.Process(
+            target=nme.interactive_tk_mpl.plotting,
+            args=(plotting_func,), kwargs=plotting_kws)
+        proc.start()
+    else:
+        nme.interactive_tk_mpl.plotting(plotting_func, **plotting_kws)
 
 
 # ======================================================================
@@ -577,7 +505,7 @@ def main():
 
     loader = io_selector(args.in_filepath, args.file_type)
     arr = loader(args.in_filepath)
-    explore(arr, args.mode)
+    explore(arr, args.mode, spawn=True)
 
     elapsed(__file__[len(PATH['base']) + 1:])
     msg(report())
