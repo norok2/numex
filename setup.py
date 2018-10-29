@@ -144,6 +144,7 @@ setup(
         'pytk',
         'setuptools',
         'flyingcircus',
+        'h5py',
     ],
 
     setup_requires=[
