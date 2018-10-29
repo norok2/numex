@@ -34,7 +34,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # :: Local Imports
 import numex as nme
 import numex.interactive_tk_mpl
-from numex.plugins import EXT, synthetic, io_numpy, io_nibabel
+from numex.plugins import EXT, synthetic, io_numpy, io_nibabel, io_bart_cfl
 
 from numex import INFO, PATH
 from numex import VERB_LVL, D_VERB_LVL

@@ -2,8 +2,6 @@ from numex.plugins import EXT
 import numpy as np
 
 try:
-    import nibabel as nib
-
 
     # ======================================================================
     def load(filepath):
@@ -18,6 +16,7 @@ try:
         Returns:
             arr (ndarray): The data read.
         """
+
         # determine base filepath
         mask = slice(None, -4, None) \
             if filepath.endswith('.hdr') or filepath.endswith('.cfl') \
@@ -46,8 +45,8 @@ try:
         return arr.reshape(shape, order='F')
 
 
-    EXT['nii'] = load
-    EXT['nii.gz'] = load
+    EXT['cfl'] = load
+    EXT['hdr'] = load
 
 except ImportError:
     pass

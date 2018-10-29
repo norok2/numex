@@ -1,5 +1,4 @@
 from numex.plugins import EXT
-import numpy as np
 
 try:
     import nibabel as nib
