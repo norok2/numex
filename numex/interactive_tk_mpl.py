@@ -61,7 +61,7 @@ import doctest  # Test interactive Python examples
 # :: External Imports
 import matplotlib as mpl  # Matplotlib (2D/3D plotting library)
 import pytk
-import pytk.utils
+import pytk.util
 import pytk.widgets
 
 import matplotlib.backends.backend_tkagg as tkagg
@@ -114,7 +114,7 @@ class PytkAbout(pytk.Window):
         self.bind('<Return>', self.destroy)
         self.bind('<Escape>', self.destroy)
 
-        pytk.utils.center(self, self.parent)
+        pytk.util.center(self, self.parent)
 
         self.grab_set()
         self.wait_window(self)
@@ -146,7 +146,7 @@ class PytkMain(pytk.widgets.Frame):
         # print(self.style.theme_names())
         self.style.theme_use('clam')
         self.pack(fill='both', expand=True)
-        pytk.utils.center(self.parent)
+        pytk.util.center(self.parent)
 
         self._make_menu()
 
@@ -299,7 +299,7 @@ def plotting(
     app = gui_main(root, func, interactives, *args, **kwargs)
     if resources_path is None:
         resources_path = PATH['resources']
-    pytk.utils.set_icon(root, 'icon', resources_path)
+    pytk.util.set_icon(root, 'icon', resources_path)
     root.mainloop()
     return root
 
