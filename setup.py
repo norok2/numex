@@ -24,7 +24,7 @@ from setuptools import find_packages
 
 # ======================================================================
 # :: Additional imports
-from numex import PATH
+# from numex import PATH
 
 # ======================================================================
 # project specific variables
