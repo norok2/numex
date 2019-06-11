@@ -10,7 +10,7 @@ In particular, two objects need to be defined:
     - a `matplotlib.Axes` where the plot is shown (this is used internally)
     - the dictionary of parameters for which interactivity is desired
 - an ordered dictionary with interactivity information, where the key
-  correspond to the internal name of the parameter (useful for **kwargs magic),
+  correspond to the internal name of the parameter (useful for kwargs magic),
   and the value is a dictionary with the following required fields:
     - 'label': the printing name of the variable (will show in GUI)
     - 'default': the default value
@@ -250,7 +250,7 @@ class PytkMain(pytk.widgets.Frame):
         for k, v in self.wdgInteractives.items():
             v['var'].trace_vdelete('w', v['trace'])
 
-    def actionPlotUpdate(self, *args):
+    def actionPlotUpdate(self, *_args):
         """Update the plot."""
         self.fig.clear()
         if hasattr(self, 'wdgInteractives'):
@@ -293,10 +293,10 @@ def plotting(
         interactives,
         gui_main=PytkMain,
         resources_path=None,
-        *args,
-        **kwargs):
+        *_args,
+        **_kws):
     root = pytk.tk.Tk()
-    app = gui_main(root, func, interactives, *args, **kwargs)
+    app = gui_main(root, func, interactives, *_args, **_kws)
     if resources_path is None:
         resources_path = PATH['resources']
     pytk.util.set_icon(root, 'icon', resources_path)

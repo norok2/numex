@@ -16,8 +16,8 @@ except ImportError:
 def load(
         filepath,
         selected=None,
-        *args,
-        **kwargs):
+        *_args,
+        **_kws):
     """
     Read a MATLAB file.
 
@@ -36,7 +36,7 @@ def load(
         from scipy.io import loadmat
 
 
-        mats = loadmat(filepath, *args, **kwargs)
+        mats = loadmat(filepath, *_args, **_kws)
     except ImportError:
         mats = None
     except NotImplementedError:
