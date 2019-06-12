@@ -11,8 +11,8 @@ def load(
 
     Args:
         filepath (str): The input file path.
-        *_args (Iterable): Positional arguments for `np.load()`.
-        **_kws (dict|Iterable): Keyword arguments for `np.load()`.
+        *_args: Positional arguments for `np.load()`.
+        **_kws: Keyword arguments for `np.load()`.
 
     Returns:
         arr (np.ndarray): The array data.

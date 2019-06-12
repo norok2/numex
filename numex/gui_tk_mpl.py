@@ -27,7 +27,6 @@ import multiprocessing  # Process-based parallelism
 # :: External Imports
 import numpy as np  # NumPy (multidimensional numerical arrays library)
 import flyingcircus as fc  # Everything you always wanted to have in Python.*
-import flyingcircus.util
 import matplotlib.cm, matplotlib.lines, matplotlib.colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
