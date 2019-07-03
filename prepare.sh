@@ -8,5 +8,5 @@ cp ${PACKAGE}_logo.png icon.png
 convert icon.png icon.xbm
 convert icon.png icon.gif
 
-mkdir -p ../${PACKAGE}/re
+mkdir -p ../${PACKAGE}/resources/
 mv icon.* ../${PACKAGE}/resources/
