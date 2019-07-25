@@ -37,7 +37,7 @@ from numex.plugins import EXT, synthetic, io_numpy, io_nibabel, io_bart_cfl
 
 from numex import INFO, PATH
 from numex import VERB_LVL, D_VERB_LVL
-from numex import msg, dbg
+from numex import msg, dbg, fmt, fmtm
 from numex import elapsed, report
 
 TITLE = nme.__doc__.strip().split('\n')[0][:-1]
@@ -72,7 +72,7 @@ def io_selector(filepath, mode=None):
         if ext[1:] in EXT:
             loader = EXT[ext[1:]]
         else:
-            text = 'Could not load data from `{filepath}`.'.format(**locals())
+            text = fmtm('Could not load data from `{filepath}`.')
             raise ValueError(text)
     else:
         try:
@@ -457,16 +457,14 @@ def handle_arg():
     # :: Create Argument Parser
     arg_parser = argparse.ArgumentParser(
         description=__doc__,
-        epilog='v.{} - {}\n{}'.format(
-            INFO['version'], INFO['author'], INFO['license']),
+        epilog=fmtm('v.{version} - {author}\n{license}', INFO),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     # :: Add POSIX standard arguments
     arg_parser.add_argument(
         '--ver', '--version',
-        version='%(prog)s - ver. {}\n{}\n{} {}\n{}'.format(
-            INFO['version'],
-            next(line for line in __doc__.splitlines() if line),
-            INFO['copyright'], INFO['author'], INFO['notice']),
+        version=fmt(
+            '%(prog)s - ver. {version}\n{}\n{copyright} {author}\n{notice}',
+            next(line for line in __doc__.splitlines() if line), **INFO),
         action='version')
     arg_parser.add_argument(
         '-v', '--verbose',

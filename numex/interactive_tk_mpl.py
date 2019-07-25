@@ -72,7 +72,7 @@ import numex as nme
 from numex import INFO, PATH, MY_GREETINGS
 # from numex import VERB_LVL, D_VERB_LVL, VERB_LVL_NAMES
 from numex import elapsed, report
-from numex import msg, dbg
+from numex import msg, dbg, fmt, fmtm
 
 # ======================================================================
 _MIN_WIDTH = 320
