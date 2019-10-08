@@ -209,8 +209,8 @@ def plot_ndarray_1d(
             y_arrs = (y_arr.real, y_arr.imag)
             titles = ('Real Part', 'Imaginary Part')
             # data_lim = (
-            #     min([np.min(x) for x in y_arrs]),
-            #     max([np.max(x) for x in y_arrs]))
+            #     min(np.min(x) for x in y_arrs),
+            #     max(np.max(x) for x in y_arrs))
             share_y = True
             data_lims = (None, None)
             if params['cx_mode'] == 'mag-phase':
@@ -283,8 +283,8 @@ def plot_ndarray_2d_plot_xy(
             xy_arrs = ((x_arr.real, y_arr.real), (x_arr.imag, y_arr.imag))
             titles = ('Real Part', 'Imaginary Part')
             # data_lim = (
-            #     min([np.min(x) for x in y_arrs]),
-            #     max([np.max(x) for x in y_arrs]))
+            #     min(np.min(x) for x in y_arrs),
+            #     max(np.max(x) for x in y_arrs))
             share_xy = True
             data_lims = (None, None)
             if params['cx_mode'] == 'mag-phase':
