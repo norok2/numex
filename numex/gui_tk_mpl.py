@@ -67,7 +67,7 @@ MODES = {
 
 # ======================================================================
 def io_selector(filepath, mode=None):
-    root, ext = fc.base.split_ext(filepath)
+    root, ext = fc.split_ext(filepath)
     if mode is None:
         if ext[1:] in EXT:
             loader = EXT[ext[1:]]
