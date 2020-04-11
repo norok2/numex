@@ -14,13 +14,13 @@ The recommended way of installing the software is through
     $ pip install numex
 
 Alternatively, you can clone the source repository from
-`Bitbucket <https://bitbucket.org/norok2/numex>`_:
+`GitHub <https://github.com/norok2/numex>`_:
 
 .. code:: shell
 
     $ mkdir numex
     $ cd numex
-    $ git clone git@bitbucket.org:norok2/numex.git
+    $ git clone git@github.com:norok2/numex.git
     $ python setup.py install
 
 (some steps may require additional permissions depending on your configuration)
