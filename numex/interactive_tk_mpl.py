@@ -240,7 +240,7 @@ class PytkMain(pytk.widgets.Frame):
         self.mnuMain.add_cascade(label='Menu', menu=self.mnuPlot)
         self.mnuPlot.add_command(label='Exit', command=self.actionExit)
         self.mnuParams = pytk.widgets.Menu(self.mnuMain, tearoff=False)
-        self.mnuMain.add_cascade(label='Params', menu=self.mnuParams)
+        self.mnuMain.add_cascade(label='Parameters', menu=self.mnuParams)
         self.mnuParams.add_command(label='Reset', command=self.actionReset)
         self.mnuParams.add_separator()
         self.mnuParams.add_command(label='Import', command=self.actionImport)
