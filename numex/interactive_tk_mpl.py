@@ -310,7 +310,8 @@ class PytkMain(pytk.widgets.Frame):
                     except KeyError:
                         pass
             except (AttributeError, json.JSONDecodeError):
-                pass
+                pytk.messagebox.showwarning(
+                    'Warning', 'Could not import data from file!')
         self._bind_interactions()
         self.actionPlotUpdate()
 
