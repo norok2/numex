@@ -54,9 +54,11 @@ from __future__ import (
 
 # ======================================================================
 # :: Python Standard Library Imports
+import os  # Miscellaneous operating system interfaces
 import collections  # Container datatypes
 import datetime  # Basic date and time types
 import doctest  # Test interactive Python examples
+import json  # JSON encoder and decoder [JSON: JavaScript Object Notation]
 
 # :: External Imports
 import matplotlib as mpl  # Matplotlib (2D/3D plotting library)
@@ -133,6 +135,7 @@ class PytkMain(pytk.widgets.Frame):
         self.func_kwargs = func_kwargs
         self.interactives = interactives
         self.about = about
+        self.cwd = '.'
 
         # :: initialization of the UI
         self.win = super(PytkMain, self).__init__(
@@ -234,10 +237,14 @@ class PytkMain(pytk.widgets.Frame):
         self.mnuMain = pytk.widgets.Menu(self.parent, tearoff=False)
         self.parent.config(menu=self.mnuMain)
         self.mnuPlot = pytk.widgets.Menu(self.mnuMain, tearoff=False)
-        self.mnuMain.add_cascade(label='Plot', menu=self.mnuPlot)
-        self.mnuPlot.add_command(label='Reset', command=self.actionReset)
-        self.mnuPlot.add_separator()
+        self.mnuMain.add_cascade(label='Menu', menu=self.mnuPlot)
         self.mnuPlot.add_command(label='Exit', command=self.actionExit)
+        self.mnuParams = pytk.widgets.Menu(self.mnuMain, tearoff=False)
+        self.mnuMain.add_cascade(label='Params', menu=self.mnuParams)
+        self.mnuParams.add_command(label='Reset', command=self.actionReset)
+        self.mnuParams.add_separator()
+        self.mnuParams.add_command(label='Import', command=self.actionImport)
+        self.mnuParams.add_command(label='Export', command=self.actionExport)
         self.mnuHelp = pytk.widgets.Menu(self.mnuMain, tearoff=False)
         self.mnuMain.add_cascade(label='Help', menu=self.mnuHelp)
         self.mnuHelp.add_command(label='About', command=self.actionAbout)
@@ -283,6 +290,42 @@ class PytkMain(pytk.widgets.Frame):
         self._unbind_interactions()
         for name, info in self.interactives.items():
             self.wdgInteractives[name]['var'].set(info['default'])
+        self._bind_interactions()
+        self.actionPlotUpdate()
+
+    def actionImport(self, event=None):
+        """Action on Import."""
+        self._unbind_interactions()
+        filepath = pytk.filedialog.askopenfilename(
+            parent=self, title='Import Parameters', defaultextension='.json',
+            initialdir=self.cwd, filetypes=[('JSON Files', '*.json')])
+        if filepath:
+            self.cwd = os.path.dirname(filepath)
+            try:
+                with open(filepath, 'r') as file_obj:
+                    data = json.load(file_obj)
+                for k, v in data.items():
+                    try:
+                        self.wdgInteractives[k]['var'].set(v)
+                    except KeyError:
+                        pass
+            except json.JSONDecodeError:
+                pass
+        self._bind_interactions()
+        self.actionPlotUpdate()
+
+    def actionExport(self, event=None):
+        """Action on Export."""
+        self._unbind_interactions()
+        filepath = pytk.filedialog.asksaveasfilename(
+            parent=self, title='Import Parameters', defaultextension='.json',
+            initialdir=self.cwd, filetypes=[('JSON Files', '*.json')],
+            confirmoverwrite=True)
+        if filepath:
+            self.cwd = os.path.dirname(filepath)
+            data = {k: v['var'].get() for k, v in self.wdgInteractives.items()}
+            with open(filepath, 'w') as file_obj:
+                json.dump(data, file_obj, sort_keys=True, indent=4)
         self._bind_interactions()
         self.actionPlotUpdate()
 
