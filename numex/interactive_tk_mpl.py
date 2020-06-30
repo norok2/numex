@@ -309,7 +309,7 @@ class PytkMain(pytk.widgets.Frame):
                         self.wdgInteractives[k]['var'].set(v)
                     except KeyError:
                         pass
-            except json.JSONDecodeError:
+            except (AttributeError, json.JSONDecodeError):
                 pass
         self._bind_interactions()
         self.actionPlotUpdate()
